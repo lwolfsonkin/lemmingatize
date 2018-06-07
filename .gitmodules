@@ -1,0 +1,3 @@
+[submodule "lib/cistern"]
+	path = lib/cistern
+	url = git@github.com:lwolfsonkin/cistern.git
