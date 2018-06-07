@@ -30,6 +30,7 @@ class ExistingDirectoryPath(PosixPath):
 		return obj
 
 def parse_args():
+	DEFAULT_MARMOT_JAR = Path(__file__).resolve().parent / 'lib' / 'marmot' / 'marmot.jar'
 	class Formatter(argparse.ArgumentDefaultsHelpFormatter, argparse.MetavarTypeHelpFormatter):
 		pass
 
@@ -46,7 +47,7 @@ def parse_args():
 	dirs.add_argument('--exp_dir', type=Path, required=True, help='Directory in which to generate output files')
 
 	marmot = train.add_argument_group('MarMoT setup', description='Setup for MarMoT')
-	marmot.add_argument('--marmot_jar', type=ExistingFilePath, required=True, help='Path to JAR file to use with MarMoT')
+	marmot.add_argument('--marmot_jar', type=ExistingFilePath, default=DEFAULT_MARMOT_JAR, help='Path to JAR file to use with MarMoT')
 	marmot.add_argument('--java_heap_limit', type=int, default=20, help='Java heap limit size in GB')
 
 	optionals = train.add_argument_group('Optional MarMoT Training Features', description='Optional Features for the tagger/lemmatizer')
@@ -68,7 +69,7 @@ def parse_args():
 	annotate.set_defaults(subcommand='annotate')
 
 	marmot = annotate.add_argument_group('MarMoT setup', description='Setup for MarMoT')
-	marmot.add_argument('--marmot_jar', type=ExistingFilePath, required=True, help='Path to JAR file to use with MarMoT')
+	marmot.add_argument('--marmot_jar', type=ExistingFilePath, default=DEFAULT_MARMOT_JAR, help='Path to JAR file to use with MarMoT')
 	marmot.add_argument('--java_heap_limit', type=int, default=20, help='Java heap limit size in GB')
 	marmot.add_argument('--marmot_model', type=ExistingFilePath, required=True, help='Path to trained MarMoT model')
 	marmot.add_argument('--lemming_model', type=ExistingFilePath, required=True, help='Path to trained Lemming model')
