@@ -1,3 +1,4 @@
+#!/usr/bin/env python3
 import argparse
 import csv
 import itertools
@@ -111,7 +112,9 @@ def parse_args():
 	columns.add_argument('--lemma_column', default=2, type=int, help='Index of lemma')
 	columns.add_argument('--tag_column', default=3, type=int, help='Index of POS tag')
 	columns.add_argument('--morph_column', default=5, type=int, help='Index of morphological tag')
-
+	if len(sys.argv) == 1:
+		parser.print_help(sys.stderr)
+		sys.exit(1)
 	return parser.parse_args()
 
 not_yellow_iter = itertools.cycle('red, green, blue, magenta, cyan, white'.split(', '))
@@ -272,3 +275,4 @@ if __name__ == '__main__':
 		annotate(args)
 	elif args.subcommand == 'accuracy':
 		accuracy(args)
+
