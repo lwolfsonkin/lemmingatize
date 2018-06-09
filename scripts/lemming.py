@@ -37,7 +37,7 @@ def parse_args():
 	class Formatter(argparse.ArgumentDefaultsHelpFormatter, argparse.MetavarTypeHelpFormatter):
 		pass
 
-	parser = argparse.ArgumentParser()
+	parser = argparse.ArgumentParser(description='lemmingatizer: A python wrapper around the open-source package `Lemming` for joint lemmatization and POS/morphological tagging.')
 	parser.set_defaults(subcommand=None)
 	subparsers = parser.add_subparsers()
 
@@ -95,7 +95,7 @@ def parse_args():
 	###### ACCURACY ####
 	accuracy = subparsers.add_parser(
 		'accuracy', formatter_class=Formatter,
-		help='Compute tagging accuracy of MarMoT predictions against an oracle.',
+		help='Compute tagging/lemmatization accuracy of MarMoT/Lemming predictions against an oracle.',
 		description='Prints tagging accuracy of a prediction file versus an oracle. Accuracy can either be computed with respect to POS tags, morphological tags, lemmas, or some combination.')
 	accuracy.set_defaults(subcommand='accuracy')
 
