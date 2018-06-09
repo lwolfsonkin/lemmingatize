@@ -31,7 +31,9 @@ class ExistingDirectoryPath(PosixPath):
 		return obj
 
 def parse_args():
-	DEFAULT_MARMOT_JAR = Path(__file__).resolve().parent / 'lib' / 'marmot' / 'marmot.jar'
+	# NOTE: DEFAULT_MARMOT_JAR was converted to str due to the way that argparse works: it will not apply the `type` function
+	# to the default data unless [the default is a string type](https://docs.python.org/3/library/argparse.html#default)
+	DEFAULT_MARMOT_JAR = str(Path(__file__).resolve().parent.parent / 'lib' / 'cistern' / 'marmot' / 'marmot.jar')
 	class Formatter(argparse.ArgumentDefaultsHelpFormatter, argparse.MetavarTypeHelpFormatter):
 		pass
 
