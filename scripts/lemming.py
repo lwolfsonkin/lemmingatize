@@ -6,6 +6,7 @@ import operator
 from pathlib import Path, PosixPath
 import sys
 import tempfile
+from typing import IO
 
 import sh
 from termcolor import cprint
@@ -30,7 +31,7 @@ class ExistingDirectoryPath(PosixPath):
 			# raise NotADirectoryError(obj)
 		return obj
 
-def parse_args():
+def parse_args() -> argparse.Namespace:
 	# NOTE: DEFAULT_MARMOT_JAR was converted to str due to the way that argparse works: it will not apply the `type` function
 	# to the default data unless [the default is a string type](https://docs.python.org/3/library/argparse.html#default)
 	DEFAULT_MARMOT_JAR = str(Path(__file__).resolve().parent.parent / 'lib' / 'cistern' / 'marmot' / 'marmot.jar')
@@ -139,20 +140,31 @@ def cmd(command):
 			p = command(*argstring.split(), _out=colored_stdout, _err=colored_stderr, _bg=True)
 			p.wait()
 			return p
-		except KeyboardInterrupt as e:
+		except KeyboardInterrupt:
 			if p is not None:
 				p.kill()
 			raise
 		
 	return constructed_command
 
-def globbed_single_file_find(path, glob):
+def globbed_single_file_find(path: Path, glob: str) -> Path:
 	try:
 		return next(path.glob(glob))
 	except StopIteration as e:
 		raise FileNotFoundError(path / glob) from e
 
-def train(args):
+def open_possibly_with_gzip(filename: Path, mode: str='r', compresslevel: int=2) -> IO:
+    """
+    Assume the file is gzip compressed if the filename ends with `.gz`.
+    Else, open as a normal text file
+    """
+    f = filename.open(mode)
+    if '.gz' in filename.suffixes:
+        import gzip
+        f = gzip.open(f, compresslevel=compresslevel)
+    return f
+
+def train(args: argparse.Namespace):
 
 	
 	# find CONLLU format train and test files from UD folder
@@ -205,14 +217,14 @@ def train(args):
 		annotate(args)
 
 
-def annotate(args):
+def annotate(args: argparse.Namespace):
 
-	with tempfile.NamedTemporaryFile('r', dir=args.pred_file.absolute().parent) as temp:
+	with tempfile.NamedTemporaryFile('r', dir=args.pred_file.expanduser().resolve().parent) as temp:
 		temp_path = temp.name
 		cmd('java')(f'-Xmx{args.java_heap_limit}G -cp {args.marmot_jar} marmot.morph.cmd.Annotator -model-file {args.marmot_model} -lemmatizer-file {args.lemming_model} -test-file form-index={args.input_form_column},{args.input_file} -pred-file {temp_path} -tag-morph true -lemmatize true -verbose true')
 
 		# reorder columns to be in line with settings
-		with args.pred_file.open('w') as pred_file:
+		with open_possibly_with_gzip(args.pred_file, mode='w') as pred_file:
 			col_count = 1 + max([args.form_column, args.lemma_column, args.tag_column, args.morph_column])
 			temp.seek(0)
 			for row in csv.reader(temp, delimiter='\t', quoting=csv.QUOTE_NONE):
@@ -250,7 +262,7 @@ def annotate(args):
 	# 
 	# lemming_annotate(f'{args.marmot_jar} {tagger_model} {lemming_model} {args.form_column} {full_dev} {dev_pred}')
 
-def accuracy(args):
+def accuracy(args: argparse.Namespace):
 
 	criteria = []
 	if 'pos' in args.tag:

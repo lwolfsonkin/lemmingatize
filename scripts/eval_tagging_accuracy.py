@@ -11,6 +11,7 @@ class POSsed(NamedTuple):
     pos: str
     mtag: str
 
+# TODO: Make this able to evaluate accuracy of gzipped files as well
 def output_generator(f_name, idx_col, form_col, lem_col, pos_col, mtag_col):
     with open(f_name, 'r') as to_f:
         indices_getter = itemgetter(idx_col, form_col, lem_col, pos_col, mtag_col)
