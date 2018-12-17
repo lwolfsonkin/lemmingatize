@@ -155,13 +155,19 @@ def globbed_single_file_find(path: Path, glob: str) -> Path:
 
 def open_possibly_with_gzip(filename: Path, mode: str='r', compresslevel: int=2) -> IO:
     """
-    Assume the file is gzip compressed if the filename ends with `.gz`.
+    Assume the file is gzip compressed if the filename contains a `.gz` suffix.
     Else, open as a normal text file
+
+    Text mode `t` is the default, and is set if unspecified (which is the
+    default for normal files, but not for `gzip` files)
     """
-    f = filename.open(mode)
+    if 'b' not in mode and 't' not in mode:
+        mode += 't'
     if '.gz' in filename.suffixes:
         import gzip
-        f = gzip.open(f, compresslevel=compresslevel)
+        f = gzip.open(filename, mode=mode, compresslevel=compresslevel)
+    else:
+        f = filename.open(mode)
     return f
 
 def train(args: argparse.Namespace):
