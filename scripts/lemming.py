@@ -256,9 +256,22 @@ def annotate(args: argparse.Namespace):
 					print(file=pred_file)
 
 	if args.accuracy:
-		args.tag = ['lemma']
 		args.pred_file = args.pred_file
 		args.oracle_file = args.input_file
+		args.tag = ['lemma']
+		# Lemma accuracy
+		accuracy(args)
+		args.tag = ['pos', 'morph']
+		# pos-morph accuracy
+		accuracy(args)
+
+		args.only_oov = True
+		args.vocab_file = args.input_file
+		args.tag = ['lemma']
+		# Lemma OOV accuracy
+		accuracy(args)
+		args.tag = ['pos', 'morph']
+		# POS-morph OOV accuracy
 		accuracy(args)
 	# ######
 	# prediction_path = working_exp_dir / 'train-pred.conllu'
@@ -285,7 +298,10 @@ def accuracy(args: argparse.Namespace):
 
 	idx_col, form_col, lem_col, pos_col, mtag_col = args.token_idx_column, args.form_column, args.lemma_column, args.tag_column, args.morph_column
 
-	print(tagging_accuracy(args.oracle_file, args.pred_file, args.vocab_file, tag2str, idx_col, form_col, lem_col, pos_col, mtag_col, only_oov=args.only_oov))
+	print(
+		f'{"-".join(sorted(args.tag))}+{"oov" if args.only_oov else "all"}:',
+		tagging_accuracy(args.oracle_file, args.pred_file, args.vocab_file, tag2str, idx_col, form_col, lem_col, pos_col, mtag_col, only_oov=args.only_oov)
+	)
 
 if __name__ == '__main__':
 	args = parse_args()
