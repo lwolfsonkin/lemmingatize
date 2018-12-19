@@ -256,6 +256,7 @@ def annotate(args: argparse.Namespace):
 					print(file=pred_file)
 
 	if args.accuracy:
+		args.only_oov = False
 		args.pred_file = args.pred_file
 		args.oracle_file = args.input_file
 		args.tag = ['lemma']
