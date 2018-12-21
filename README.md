@@ -23,4 +23,4 @@ and setup by running
 
 ## Use
 
-Now, you can use Lemmingatize to train lemming models, use lemming models to annotate corpora, or measure the lemmatization/tagging accuracies by using the `./lemming` command at the root of this repo.
+Now, you can use Lemmingatize to train lemming models, use lemming models to annotate corpora, or measure the lemmatization/tagging accuracies: all using the `./lemming` command at the root of this repo.
