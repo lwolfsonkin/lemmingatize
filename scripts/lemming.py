@@ -257,6 +257,7 @@ def annotate(args: argparse.Namespace):
 
 	if args.accuracy:
 		args.only_oov = False
+		args.vocab_file = args.input_file #only used by the only_oov=True runs
 		args.pred_file = args.pred_file
 		args.oracle_file = args.input_file
 		args.tag = ['lemma']
@@ -267,7 +268,6 @@ def annotate(args: argparse.Namespace):
 		accuracy(args)
 
 		args.only_oov = True
-		args.vocab_file = args.input_file
 		args.tag = ['lemma']
 		# Lemma OOV accuracy
 		accuracy(args)
