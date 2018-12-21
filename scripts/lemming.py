@@ -118,7 +118,11 @@ def parse_args() -> argparse.Namespace:
 	if len(sys.argv) == 1:
 		parser.print_help(sys.stderr)
 		sys.exit(1)
-	return parser.parse_args()
+
+	args = parser.parse_args()
+	if args.subcommand == 'accuracy' and args.only_oov and args.vocab_file is None:
+		accuracy.error('--vocab_file must be specified if --only_oov=True')
+	return args
 
 not_yellow_iter = itertools.cycle('red, green, blue, magenta, cyan, white'.split(', '))
 
@@ -256,24 +260,17 @@ def annotate(args: argparse.Namespace):
 					print(file=pred_file)
 
 	if args.accuracy:
-		args.only_oov = False
 		args.vocab_file = args.input_file #only used by the only_oov=True runs
 		args.pred_file = args.pred_file
 		args.oracle_file = args.input_file
-		args.tag = ['lemma']
-		# Lemma accuracy
-		accuracy(args)
-		args.tag = ['pos', 'morph']
-		# pos-morph accuracy
-		accuracy(args)
 
-		args.only_oov = True
-		args.tag = ['lemma']
-		# Lemma OOV accuracy
-		accuracy(args)
-		args.tag = ['pos', 'morph']
-		# POS-morph OOV accuracy
-		accuracy(args)
+		# first overall accuracies, then OOV accuracies
+		for only_oov in (False, True):
+			args.only_oov = only_oov
+			# first lemmatization accuracies, then POS/m-tag accuracies
+			for tag_spec in (['lemma'], ['pos', 'morph']):
+				args.tag = tag_spec
+				accuracy(args)
 	# ######
 	# prediction_path = working_exp_dir / 'train-pred.conllu'
 	
