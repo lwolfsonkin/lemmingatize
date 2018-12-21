@@ -235,7 +235,7 @@ def annotate(args: argparse.Namespace):
 
 		# reorder columns to be in line with settings
 		with open_possibly_with_gzip(args.pred_file, mode='w') as pred_file:
-			col_count = 1 + max([args.form_column, args.lemma_column, args.tag_column, args.morph_column])
+			col_count = 10 # ConLL-U files have 10 columns
 			temp.seek(0)
 			for row in csv.reader(temp, delimiter='\t', quoting=csv.QUOTE_NONE):
 				if row:
